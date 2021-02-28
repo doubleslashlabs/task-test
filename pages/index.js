@@ -4,9 +4,11 @@ import Navbar from '../components/Navbar'
 import Todo from '../components/Todo'
 import { table, minifyRecords } from './api/utils/airtable'
 import { TodosContex } from '../context/TodosContex'
+import TodoForm from '../components/TodoForm'
 
 export default function Home({ initialTodos }) {
   const { todos, setTodos } = useContext(TodosContex)
+
   useEffect(() => {
     setTodos(initialTodos)
   }, [])
@@ -18,10 +20,12 @@ export default function Home({ initialTodos }) {
       <Head>
         <title>Next JS - Task Manager</title>
         <link rel='icon' href='/favicon.ico' />
+        <meta charSet='UTF-8' />
       </Head>
       <Navbar />
       <main>
-        <h1>Todo List</h1>
+        <h1 className='text-2xl text-center mb-4'>Todo List</h1>
+        <TodoForm />
         <ul>
           {todos && todos.map((todo) => <Todo key={todo.id} todo={todo} />)}
         </ul>
@@ -31,6 +35,8 @@ export default function Home({ initialTodos }) {
 }
 
 export async function getServerSideProps(context) {
+  // const session = await auth0.getSession(context.req)
+
   try {
     const todos = await table.select({}).firstPage()
     return {
