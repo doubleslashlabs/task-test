@@ -5,10 +5,12 @@ import { table } from '../utils/airtable'
 console.log(tasks)
 
 export default async (req, res) => {
-  const { description } = req.body
+  const { description, color } = req.body
 
   try {
-    const createdRecords = await table.create([{ fields: { description } }])
+    const createdRecords = await table.create([
+      { fields: { description, color: '#0000ff' } },
+    ])
     const createdRecord = {
       id: createdRecords[0].id,
       fields: createdRecords[0].fields,

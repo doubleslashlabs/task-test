@@ -7,7 +7,9 @@ export default function Todo({ todo }) {
     const updatedFields = {
       ...todo.fields,
       completed: !todo.fields.completed,
+      color: todo.fields.color,
     }
+
     const updatedTodo = { id: todo.id, fields: updatedFields }
     updateTodos(updatedTodo)
   }
@@ -24,7 +26,7 @@ export default function Todo({ todo }) {
       <p
         className={`flex-1 ${todo.fields.completed ? 'line-through' : ''} `}
         style={{
-          color: todo.fields.completed === true ? '#ff0000' : '#0000ff',
+          color: todo.fields.completed === true ? '#0000ff' : '#ff0000',
         }}
       >
         {todo.fields.description}
