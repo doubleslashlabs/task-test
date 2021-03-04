@@ -1,15 +1,17 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { tasks } from './_tasks'
 import { table } from '../utils/airtable'
+import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0'
 
 console.log(tasks)
 
-export default async (req, res) => {
+export default withApiAuthRequired(async (req, res) => {
   const { description, color } = req.body
+  const { user } = getSession(req, res)
 
   try {
     const createdRecords = await table.create([
-      { fields: { description, color: '#0000ff' } },
+      { fields: { description, userId: user.sub, color: '#0000ff' } },
     ])
     const createdRecord = {
       id: createdRecords[0].id,
@@ -20,4 +22,4 @@ export default async (req, res) => {
     console.error(error)
     res.status(500).json({ msg: 'Something went wrong' })
   }
-}
+})

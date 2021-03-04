@@ -5,9 +5,11 @@ import Todo from '../components/Todo'
 import { table, minifyRecords } from './api/utils/airtable'
 import { TodosContex } from '../context/TodosContex'
 import TodoForm from '../components/TodoForm'
+import { useUser } from '@auth0/nextjs-auth0'
 
 export default function Home({ initialTodos }) {
   const { todos, setTodos } = useContext(TodosContex)
+  const { user } = useUser()
 
   useEffect(() => {
     setTodos(initialTodos)
@@ -22,9 +24,11 @@ export default function Home({ initialTodos }) {
         <link rel='icon' href='/favicon.ico' />
         <meta charSet='UTF-8' />
       </Head>
-      <Navbar />
+      <Navbar user={user} />
       <main>
-        <h1 className='text-2xl text-center mb-4'>Todo List</h1>
+        <h1 className='text-2xl text-center mb-4'>
+          Todo List of {user ? user.nickname : null || 'Anonymous'}
+        </h1>
         <TodoForm />
         <ul>
           {todos && todos.map((todo) => <Todo key={todo.id} todo={todo} />)}
@@ -35,8 +39,6 @@ export default function Home({ initialTodos }) {
 }
 
 export async function getServerSideProps(context) {
-  // const session = await auth0.getSession(context.req)
-
   try {
     const todos = await table.select({}).firstPage()
     return {
