@@ -1,16 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
-import { tasks } from './_tasks'
 import { table, getMinifiedRecord } from '../utils/airtable'
+import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0'
 
-console.log(tasks)
-
-// export default (req, res) => {
-//   res.status(200).json(tasks)
-// }
-
-export default async (req, res) => {
+export default withApiAuthRequired(async (req, res) => {
   const { id, fields } = req.body
+  const { user } = getSession(req, res)
   try {
     const updateRecords = await table.update([{ id, fields }])
     res.status(200).json(getMinifiedRecord(updateRecords[0]))
@@ -18,4 +13,4 @@ export default async (req, res) => {
     console.error(error)
     res.status(500).json({ msg: 'Something went wrong' })
   }
-}
+})

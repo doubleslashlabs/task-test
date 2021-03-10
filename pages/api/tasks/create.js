@@ -1,9 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { tasks } from './_tasks'
 import { table } from '../utils/airtable'
 import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0'
-
-console.log(tasks)
 
 export default withApiAuthRequired(async (req, res) => {
   const { description, color } = req.body

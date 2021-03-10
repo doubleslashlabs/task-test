@@ -1,7 +1,6 @@
 import React from 'react'
 
 export default function NavBar({ user }) {
-  console.log(user)
   return (
     <nav className='flex justify-between items-center py-4'>
       <p className='text-2xl font-bold text-grey-800'>My Todos</p>

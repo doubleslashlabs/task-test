@@ -3,9 +3,11 @@ import { TodosProvider } from '../context/TodosContex'
 import { UserProvider } from '@auth0/nextjs-auth0'
 
 function MyApp({ Component, pageProps }) {
+  const { user } = pageProps
+
   return (
     <TodosProvider>
-      <UserProvider>
+      <UserProvider user={user}>
         <div className='container mx-auto my-10 max-w-sm'>
           <Component {...pageProps} />
         </div>

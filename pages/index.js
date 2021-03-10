@@ -5,17 +5,15 @@ import Todo from '../components/Todo'
 import { table, minifyRecords } from './api/utils/airtable'
 import { TodosContex } from '../context/TodosContex'
 import TodoForm from '../components/TodoForm'
-import { useUser } from '@auth0/nextjs-auth0'
+import { useUser, withPageAuthRequired, getSession } from '@auth0/nextjs-auth0'
 
 export default function Home({ initialTodos }) {
   const { todos, setTodos } = useContext(TodosContex)
-  const { user } = useUser()
+  const { user, error, isLoading } = useUser()
 
   useEffect(() => {
     setTodos(initialTodos)
   }, [])
-
-  console.log(initialTodos)
 
   return (
     <div>
@@ -27,7 +25,7 @@ export default function Home({ initialTodos }) {
       <Navbar user={user} />
       <main>
         <h1 className='text-2xl text-center mb-4'>
-          Todo List of {user ? user.nickname : null || 'Anonymous'}
+          {user ? `Todo List of: ${user.nickname}` : null}
         </h1>
         <TodoForm />
         <ul>
@@ -39,19 +37,17 @@ export default function Home({ initialTodos }) {
 }
 
 export async function getServerSideProps(context) {
-  try {
-    const todos = await table.select({}).firstPage()
-    return {
-      props: {
-        initialTodos: minifyRecords(todos),
-      },
-    }
-  } catch (error) {
-    console.error(error)
-    return {
-      props: {
-        error: 'Something went wrong',
-      },
-    }
+  const session = await getSession(context.req, context.res)
+  let todos = []
+  if (session?.user) {
+    todos = await table
+      .select({ filterByFormula: `userId = '${session.user.sub}'` })
+      .firstPage()
+  }
+  return {
+    props: {
+      initialTodos: minifyRecords(todos),
+      user: session?.user || null,
+    },
   }
 }
