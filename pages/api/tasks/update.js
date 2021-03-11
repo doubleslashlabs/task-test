@@ -1,8 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
 import { table, getMinifiedRecord } from '../utils/airtable'
-import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0'
-import OwnsRecord from '../middleware/OwnsRecord'
+import { withApiAuthRequired } from '@auth0/nextjs-auth0'
 
 export default withApiAuthRequired(async (req, res) => {
   const { id, fields } = req.body
