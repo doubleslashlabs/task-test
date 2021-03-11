@@ -5,11 +5,11 @@ import Todo from '../components/Todo'
 import { table, minifyRecords } from './api/utils/airtable'
 import { TodosContex } from '../context/TodosContex'
 import TodoForm from '../components/TodoForm'
-import { useUser, withPageAuthRequired, getSession } from '@auth0/nextjs-auth0'
+import { useUser, getSession } from '@auth0/nextjs-auth0'
 
 export default function Home({ initialTodos }) {
   const { todos, setTodos } = useContext(TodosContex)
-  const { user, error, isLoading } = useUser()
+  const { user } = useUser()
 
   useEffect(() => {
     setTodos(initialTodos)
@@ -24,13 +24,19 @@ export default function Home({ initialTodos }) {
       </Head>
       <Navbar user={user} />
       <main>
-        <h1 className='text-2xl text-center mb-4'>
-          {user ? `Todo List of: ${user.nickname}` : null}
-        </h1>
-        <TodoForm />
-        <ul>
-          {todos && todos.map((todo) => <Todo key={todo.id} todo={todo} />)}
-        </ul>
+        {user ? (
+          <>
+            <h1 className='text-2xl text-center mb-4'>
+              This is <span> {user.nickname} </span> TO DO´s
+            </h1>
+            <TodoForm />
+            <ul>
+              {todos && todos.map((todo) => <Todo key={todo.id} todo={todo} />)}
+            </ul>
+          </>
+        ) : (
+          <h1 className='text-2xl text-center mb-4'>Please Sign in.</h1>
+        )}
       </main>
     </div>
   )
