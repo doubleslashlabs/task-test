@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react'
-import { TodosContex } from '../context/TodosContex'
+import { TodosContext } from '../context/TodosContext'
 
 export default function TodoForm() {
   const [todo, setTodo] = useState('')
-  const { addTodo } = useContext(TodosContex)
+  const { addTodo } = useContext(TodosContext)
 
   const handleSubmit = (e) => {
     e.preventDefault()

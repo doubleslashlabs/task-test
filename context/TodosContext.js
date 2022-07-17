@@ -1,6 +1,6 @@
 import { createContext, useState } from 'react'
 
-const TodosContex = createContext()
+const TodosContext = createContext()
 const TodosProvider = ({ children }) => {
   const [todos, setTodos] = useState([])
 
@@ -75,7 +75,7 @@ const TodosProvider = ({ children }) => {
   }
 
   return (
-    <TodosContex.Provider
+    <TodosContext.Provider
       value={{
         todos,
         setTodos,
@@ -86,8 +86,8 @@ const TodosProvider = ({ children }) => {
       }}
     >
       {children}
-    </TodosContex.Provider>
+    </TodosContext.Provider>
   )
 }
 
-export { TodosProvider, TodosContex }
+export { TodosProvider, TodosContext }
