@@ -1,55 +1,72 @@
+import { useEffect, useContext } from 'react'
 import Head from 'next/head'
-import styles from '../styles/main.module.css'
+import Navbar from '../components/Navbar'
+import Todo from '../components/Todo'
+import { table, minifyRecords } from './api/utils/airtable'
+import { TodosContext } from '../context/TodosContext'
+import TodoForm from '../components/TodoForm'
+import { useUser, getSession } from '@auth0/nextjs-auth0'
 
-export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Next JS - Task Manager</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+export default function Home({ initialTodos }) {
+    const { todos, setTodos } = useContext(TodosContext)
+    const { user, error, isLoading } = useUser()
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to Task Manager
-        </h1>
+    useEffect(() => {
+        setTodos(initialTodos)
+    }, [])
 
-        <p className={styles.description}>
-          This is based in: <a href="https://nextjs.org">Next.js!</a><br/>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+    if (isLoading) return <div>Loading...</div>
+    if (error) return <div>{error.message}</div>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+    return (
+        <div>
+            <Head>
+                <title>Next JS - Task Manager</title>
+                <link rel="icon" href="/favicon.ico" />
+                <meta charSet="UTF-8" />
+            </Head>
+            <Navbar user={user} />
+            <main>
+                {user ? (
+                    <>
+                        <h1 className="text-2xl text-center mb-4">
+                            This is <span> {user.nickname} </span> TO DO´s
+                        </h1>
+                        <TodoForm />
+                        <ul>
+                            {todos &&
+                                todos.map((todo) => (
+                                    <Todo key={todo.id} todo={todo} />
+                                ))}
+                        </ul>
+                    </>
+                ) : (
+                    <h1 className="text-2xl text-center mb-4">
+                        Please Sign in.
+                    </h1>
+                )}
+            </main>
         </div>
-      </main>
-    </div>
-  )
+    )
+}
+
+export async function getServerSideProps(context) {
+    let session
+    if (context.req && context.res) {
+        session = await getSession(context.req, context.res)
+    }
+
+    let todos = []
+    if (session?.user) {
+        todos = await table
+            .select({ filterByFormula: `userId = '${session.user.sub}'` })
+            .firstPage()
+    }
+
+    return {
+        props: {
+            initialTodos: minifyRecords(todos) || [],
+            user: session?.user || null,
+        },
+    }
 }
